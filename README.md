@@ -32,7 +32,7 @@ drop2 depends on several third-party libraries:
 
 ## Build instructions ##
 
-Make sure all dependencies are installed, and download and install [ITK](http://itk.org) and [Eigen](http://eigen.tuxfamily.org):
+Make sure all dependencies are installed, and download and install [ITK](https://itk.org/Wiki/ITK/Getting_Started/Build/Linux) and [Eigen](http://eigen.tuxfamily.org):
 
 ```
 sudo apt-get install libboost-all-dev libtbb-dev
