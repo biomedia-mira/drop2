@@ -27,7 +27,7 @@ drop2 depends on several third-party libraries:
 
 * [Eigen](eigen.tuxfamily.org)
 * [Intel TBB](https://www.threadingbuildingblocks.org/)
-* [Boost](http://www.boost.org/) (component [serialization](http://www.boost.org/doc/libs/1_57_0/libs/serialization/doc/index.html))
+* [Boost](http://www.boost.org/)
 * [ITK](http://itk.org)
 
 ## Build instructions ##
