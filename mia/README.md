@@ -6,12 +6,12 @@ mia is a lightweight, cross-platform C++ image processing library.
 
 mia depends on the [Eigen library](eigen.tuxfamily.org). In order to be able to find Eigen during compilation, set the environment variable THIRD_PARTY_DIR to the parent folder of the Eigen base folder.
 
-*Example*: If Eigen is located in /home/<user>/Coding/3rdparty/eigen, one can set the environment variable temporarily via
+*Example*: If Eigen is located in /home/user/Coding/3rdparty/eigen, one can set the environment variable temporarily via
 
 ```
 #!bash
 
-$ export THIRD_PARTY_DIR=/home/<user>/Coding/3rdparty/
+$ export THIRD_PARTY_DIR=/home/user/Coding/3rdparty/
 ```
 
 
