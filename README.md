@@ -44,6 +44,7 @@ Eigen is a header-only library and can be simply installed via:
 
 ```
 #!bash
+
 $ mkdir 3rdparty
 $ cd 3rdparty
 $ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
