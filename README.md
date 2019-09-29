@@ -36,19 +36,25 @@ If you make use of the code, please cite one of these papers in any resulting pu
 * [Eigen](eigen.tuxfamily.org)
 * [Intel TBB](https://www.threadingbuildingblocks.org/) (tested up to v.4.4)
 * [Boost](http://www.boost.org/) (tested up to v1.58)
-* [ITK](http://itk.org) (tested up to [v4.13.2](https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.2.tar.gz)
+* [ITK](http://itk.org) (tested up to [v4.13.2](https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.2.tar.gz))
 
 ## Build instructions
 
-Make sure all dependencies are installed, and download and install [ITK](https://itk.org/Wiki/ITK/Getting_Started/Build/Linux) and [Eigen](http://eigen.tuxfamily.org).
+Eigen is a header-only library and can be simply installed via:
 
-You can download and install ITK via:
+```
+#!bash
+$ mkdir 3rdparty
+$ cd 3rdparty
+$ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
+$ mkdir -p eigen && tar xvf 3.3.7.tar.gz -C eigen --strip-components=1
+```
+
+You can download and install ITK in the same `3rdparty` folder via:
 
 ```
 #!bash
 
-$ mkdir 3rdparty
-$ cd 3rdparty
 $ wget https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.2.tar.gz
 $ tar xvf InsightToolkit-4.13.2.tar.gz
 $ cd InsightToolkit-4.13.2
@@ -57,6 +63,8 @@ $ cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=../../itk ..
 $ make -j4
 ```
+
+Alternatively, you can check out these [install instructions](https://itk.org/Wiki/ITK/Getting_Started/Build/Linux).
 
 You can install Boost and TBB via `apt-get`:
 
