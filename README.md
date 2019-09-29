@@ -63,9 +63,10 @@ $ mkdir build
 $ cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=../../itk ..
 $ make -j4
+$ make install
 ```
 
-Alternatively, you can check out these [install instructions](https://itk.org/Wiki/ITK/Getting_Started/Build/Linux).
+Alternatively, you can check out these [ITK install instructions](https://itk.org/Wiki/ITK/Getting_Started/Build/Linux).
 
 You can install Boost and TBB via `apt-get`:
 
