@@ -509,6 +509,23 @@ namespace drop
         }
       }
     }
+    else
+    {
+      for (int y = 0; y < sizeY; y++)
+      {
+        for (int x = 0; x < sizeX; x++)
+        {
+          if (field(x, y, 0) == oob)
+          {
+            field(x, y, 0) = 0.0f;
+          }
+          if (field(x, y, sizeZ - 1) == oob)
+          {
+            field(x, y, sizeZ - 1) = 0.0f;
+          }
+        }
+      }
+    }
     for (int z = 0; z < sizeZ; z++)
     {
       for (int x = 0; x < sizeX; x++)

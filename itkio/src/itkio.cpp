@@ -187,7 +187,7 @@ namespace itkio
   {
     auto ext = boost::filesystem::extension(filename);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-	if (ext != ".gz" && ext != ".nii" && ext != ".nrrd" && ext != ".mhd" && ext != ".mha" && ext != ".hdr" && ext != ".png")
+	if (ext != ".gz" && ext != ".nii" && ext != ".nrrd" && ext != ".mhd" && ext != ".mha" && ext != ".hdr" && ext != ".png" && ext != ".jpg" && ext != ".jpeg")
     {
       auto dicom_image = load_dicom(filename);
       if (dicom_image.size() > 0) return dicom_image;
