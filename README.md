@@ -1,5 +1,7 @@
 # drop2
 
+[![Build Status](https://travis-ci.org/biomedia-mira/drop2.svg?branch=master)](https://travis-ci.org/biomedia-mira/drop2)
+
 *drop2* is a cross-platform C++ intensity-based image registration tool. It works for 2D and 3D images and has both linear and non-linear registration methods implemented.
 
 *Linear* (i.e., rigid and affine) registration is based on Downhill simplex optimization. *Non-linear* (i.e., deformable) registration is based on free form deformations with an efficient discrete MRF optimization scheme as introduced in:
@@ -27,7 +29,11 @@
 }
 ```
 
-If you make use of the code, please cite one of these papers in any resulting publications.
+If you make use of *drop2*, it would be great if you cite one of these papers in any resulting publications.
+
+## Historical note
+
+The original idea for using discrete MRF optimization for image registration was developed back in 2006 by Ben Glocker and Nikos Paragios. The core algorithm has been patended (Pub. No. [WO/2009/010860](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2009010860)).
 
 ## Dependencies
 
