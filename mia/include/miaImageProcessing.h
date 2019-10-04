@@ -250,6 +250,15 @@ namespace mia
   void compose(const Image& aX, const Image& aY, const Image& aZ, Image& bX, Image& bY, Image& bZ);
 
   /**
+  * \brief Composes the specified transformation with the given displacement field.
+  * \param transform The affine transformation matrix.
+  * \param fieldX The x-component of the displacement field.
+  * \param fieldY The y-component of the displacement field.
+  * \param fieldZ The z-component of the displacement field.
+  **/
+  void compose(const Eigen::Matrix4d& transform, Image& fieldX, Image& fieldY, Image& fieldZ);
+
+  /**
    * \brief Applies a Gaussian smoothing.
    * \param input The input image.
    * \param output The output image.

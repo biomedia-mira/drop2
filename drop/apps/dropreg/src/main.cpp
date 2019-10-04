@@ -80,8 +80,9 @@ int main(int argc, char* argv[])
   double n_sampling;
   double n_lambda;
   bool n_pin_boundary;
+  bool n_compose_field;
 
-  bool mode_2d;
+  bool mode_2d;  
 
   try
   {
@@ -120,6 +121,7 @@ int main(int argc, char* argv[])
     ("nsampling", po::value<double>(&n_sampling)->default_value(1), "NONLINEAR: image sampling probability [0,1]")
     ("nlambda", po::value<double>(&n_lambda)->default_value(0), "NONLINEAR: regularization weight")
     ("npin", po::bool_switch(&n_pin_boundary)->default_value(false), "NONLINEAR: pin boundaries")
+    ("ncompose", po::bool_switch(&n_compose_field)->default_value(false), "NONLINEAR: compose transformation with field")
     ;
 
     po::variables_map vm;
@@ -280,6 +282,11 @@ int main(int argc, char* argv[])
 
   warp(source, target, transform, field[0], field[1], field[2], (mia::Interpolation)o_interpolation, o_fill_value);
 
+  if (n_compose_field)
+  {
+    compose(transform, field[0], field[1], field[2]);
+  }
+
   fs::path output_path(filename_output);
   std::string basename = fs::basename(output_path);
   if (fs::extension(basename) != "") basename = fs::basename(basename);
@@ -310,7 +317,7 @@ int main(int argc, char* argv[])
   }
 
   if (run_nonlinear)
-  {
+  {    
     std::stringstream filename_field_x;
     filename_field_x << out_folder << "/" << basename << "_field_x.nii.gz";
     itkio::save(field[0], filename_field_x.str());

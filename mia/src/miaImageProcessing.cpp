@@ -349,6 +349,25 @@ namespace mia
     }
   }
 
+  void compose(const Eigen::Matrix4d& transform, Image& fieldX, Image& fieldY, Image& fieldZ)
+  {
+    for (int z = 0; z < fieldX.sizeZ(); z++)
+    {
+      for (int y = 0; y < fieldX.sizeY(); y++)
+      {
+        for (int x = 0; x < fieldX.sizeX(); x++)
+        {
+          Eigen::Vector3d s = fieldX.mapImageToWorld(Eigen::Vector3d(x, y, z));
+          Eigen::Vector4d t = transform * Eigen::Vector4d(s[0] + fieldX(x,y,z), s[1] + fieldY(x, y, z), s[2] + fieldZ(x, y, z), 1);
+          Eigen::Vector3d d = t.segment(0, 3) - s;
+          fieldX(x, y, z) = static_cast<float>(d[0]);
+          fieldY(x, y, z) = static_cast<float>(d[1]);
+          fieldZ(x, y, z) = static_cast<float>(d[2]);
+        }
+      }
+    }
+  }
+
   void gauss(const Image& input, Image& output, double sigmaX, double sigmaY, double sigmaZ)
   {
     double sigmaXinPixels = sigmaX / input.spacing()[0];
