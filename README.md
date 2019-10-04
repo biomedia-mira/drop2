@@ -31,10 +31,6 @@
 
 If you make use of *drop2*, it would be great if you cite one of these papers in any resulting publications.
 
-## Historical note
-
-The original idea for using discrete MRF optimization for image registration was developed back in 2006 by Ben Glocker and Nikos Paragios. The core algorithm has been patended (Pub. No. [WO/2009/010860](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2009010860)).
-
 ## Dependencies
 
 *drop2* depends on several third-party libraries:
@@ -104,3 +100,9 @@ The actual registration tool is called `dropreg` and will be located in `build/d
 Note, *drop2* is implemented with the intention of making image registration easy-to-use. Some internal optimization parameters are hard-coded and cannot be changed via command line arguments. Run `./dropreg -h` to see a list of arguments.
 
 Detailed instructions and examples are coming soon...
+
+## Acknowledgements
+
+The original idea for using discrete MRF optimization for image registration was developed back in 2006 by Ben Glocker and Nikos Paragios. The core algorithm has been patended (Pub. No. [WO/2009/010860](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2009010860)).
+
+We are very grateful for the support and contribution by Jiří Borovec and Jan Kybic. Their efforts on the [Automatic Non-rigid Histological Image Registration (ANHIR) challenge](https://anhir.grand-challenge.org/) made us push for the release of this updated version of the original *drop* registration method which had been lying around in a private repository for too long.
