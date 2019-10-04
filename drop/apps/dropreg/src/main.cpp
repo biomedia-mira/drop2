@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
 
   int o_interpolation;
   float o_fill_value;
+  bool o_no_image;
 
   bool run_com_alignment;
 
@@ -101,6 +102,7 @@ int main(int argc, char* argv[])
     ("fz", po::value<std::string>(&filename_field_z)->default_value(""), "filename of displacement field for Z-component")
     ("ointerp", po::value<int>(&o_interpolation)->default_value(1), "OUTPUT: image interpolation (0=NEAREST, 1=LINEAR)")
 	  ("ofill", po::value<float>(&o_fill_value)->default_value(0.0f), "OUTPUT: fill value for out of bounds")
+    ("onoimage", po::bool_switch(&o_no_image)->default_value(false), "OUTPUT: no warped image output (only transformation)")
     ("mode2d", po::bool_switch(&mode_2d)->default_value(false), "enable 2D mode")    
     ("com,c", po::bool_switch(&run_com_alignment)->default_value(false), "run CENTER OF MASS alignment")
     ("linear,l", po::bool_switch(&run_linear)->default_value(false), "run LINEAR registration")
@@ -274,18 +276,6 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
   }
 
-  // image warping and saving results
-  std::cout << "----------------------------------------" << std::endl;
-  std::cout << "WARPING image and saving results..." << std::endl;
-  std::cout << "----------------------------------------" << std::endl;
-  auto start = std::chrono::high_resolution_clock::now();
-
-  warp(source, target, transform, field[0], field[1], field[2], (mia::Interpolation)o_interpolation, o_fill_value);
-
-  if (n_compose_field)
-  {
-    compose(transform, field[0], field[1], field[2]);
-  }
 
   fs::path output_path(filename_output);
   std::string basename = fs::basename(output_path);
@@ -295,8 +285,33 @@ int main(int argc, char* argv[])
   if (out_folder == "") out_folder = ".";
   else if (!fs::exists(out_folder)) fs::create_directories(out_folder);
 
-  target.dataType(source.dataType());
-  itkio::save(target, filename_output);
+  if (!o_no_image)
+  {
+    // image warping
+    std::cout << "----------------------------------------" << std::endl;
+    std::cout << "WARPING and saving image..." << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    warp(source, target, transform, field[0], field[1], field[2], (mia::Interpolation)o_interpolation, o_fill_value);
+
+    target.dataType(source.dataType());
+    itkio::save(target, filename_output);
+    
+    auto stop = std::chrono::high_resolution_clock::now();
+    std::cout << "Finished. Timing (s): " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() / 1000.0 << std::endl;
+  }
+  
+  // saving results
+  std::cout << "----------------------------------------" << std::endl;
+  std::cout << "SAVING transformation..." << std::endl;
+  std::cout << "----------------------------------------" << std::endl;
+  auto start = std::chrono::high_resolution_clock::now();
+
+  if (n_compose_field)
+  {
+    compose(transform, field[0], field[1], field[2]);
+  }
 
   if (run_com_alignment || run_linear)
   {

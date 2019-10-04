@@ -33,126 +33,186 @@ namespace itkio
 {
   template <typename PixelType>
   void save(const mia::Image& image, const std::string& filename)
-  {
-    const unsigned int Dimension = 3;
-    typedef typename itk::Image<PixelType, Dimension> ImageType;
-    typedef typename itk::ImportImageFilter<PixelType, Dimension> ImportFilterType;
-
-    typename ImportFilterType::Pointer importer = ImportFilterType::New();
-
-    typename ImageType::SizeType size;
-    size[0] = image.sizeX();
-    size[1] = image.sizeY();
-    size[2] = image.sizeZ();
-
-    typename ImageType::IndexType start;
-    start.Fill(0);
-
-    typename ImageType::RegionType region;
-    region.SetSize(size);
-    region.SetIndex(start);
-    importer->SetRegion(region);
-
-    typename ImageType::SpacingType spacing;
-    spacing[0] = image.spacing()[0];
-    spacing[1] = image.spacing()[1];
-    spacing[2] = image.spacing()[2];
-    importer->SetSpacing(spacing);
-
-    typename ImageType::PointType origin;
-    origin[0] = image.origin()[0];
-    origin[1] = image.origin()[1];
-    origin[2] = image.origin()[2];
-    importer->SetOrigin(origin);
-
-    typename ImageType::DirectionType direction;
-    for (int r = 0; r < Dimension; r++)
-    {
-      for (int c = 0; c < Dimension; c++)
-      {
-        direction(r,c) = image.imageToWorld()(r,c);
-      }
-    }
-    importer->SetDirection(direction);
-
-    long counter = 0;
-    std::vector<PixelType> dataConvert(image.size());
-    for (auto& p : const_cast<mia::Image&>(image))
-    {
-      dataConvert[counter++] = static_cast<PixelType>(p);
-    }
-
-    importer->SetImportPointer(&dataConvert[0], image.size(), false);
-    importer->Update();
-
+  {    
     auto ext = boost::filesystem::extension(filename);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (ext == ".dcm" || ext == ".ima" || ext == "")
-    {
-      auto pos_ext = filename.rfind(ext);
-      auto fname = filename;
-      fname.erase(pos_ext, ext.length());
-      std::vector<std::string> filenames;
-      for (int i = 0; i < image.sizeZ(); i++)
-      {
 
-        std::stringstream filename_slice;
-        filename_slice << fname << "_" << (i + 1000000) << ext;
-        filenames.push_back(filename_slice.str());
+    if (image.sizeZ() == 1 && (ext == ".png" || ext == ".jpg" || ext == ".jpeg"))
+    {
+      const unsigned int Dimension = 2;
+      typedef typename itk::Image<PixelType, Dimension> ImageType;
+      typedef typename itk::ImportImageFilter<PixelType, Dimension> ImportFilterType;
+
+      typename ImportFilterType::Pointer importer = ImportFilterType::New();
+
+      typename ImageType::SizeType size;
+      size[0] = image.sizeX();
+      size[1] = image.sizeY();
+
+      typename ImageType::IndexType start;
+      start.Fill(0);
+
+      typename ImageType::RegionType region;
+      region.SetSize(size);
+      region.SetIndex(start);
+      importer->SetRegion(region);
+
+      typename ImageType::SpacingType spacing;
+      spacing[0] = image.spacing()[0];
+      spacing[1] = image.spacing()[1];
+      importer->SetSpacing(spacing);
+
+      typename ImageType::PointType origin;
+      origin[0] = image.origin()[0];
+      origin[1] = image.origin()[1];
+      importer->SetOrigin(origin);
+
+      typename ImageType::DirectionType direction;
+      for (int r = 0; r < Dimension; r++)
+      {
+        for (int c = 0; c < Dimension; c++)
+        {
+          direction(r, c) = image.imageToWorld()(r, c);
+        }
+      }
+      importer->SetDirection(direction);
+
+      long counter = 0;
+      std::vector<PixelType> dataConvert(image.size());
+      for (auto& p : const_cast<mia::Image&>(image))
+      {
+        dataConvert[counter++] = static_cast<PixelType>(p);
       }
 
-      typedef itk::GDCMImageIO ImageIOType;
-      ImageIOType::Pointer dicomIO = ImageIOType::New();
-      //for (int d = 0; d < 3; d++)
-      //{
-      //  dicomIO->SetSpacing(d, spacing[d]);
-      //  //dicomIO->SetDirection(d, );
-      //  dicomIO->SetOrigin(d, origin[d]);
-      //}
+      importer->SetImportPointer(&dataConvert[0], image.size(), false);
+      importer->Update();
 
-      typedef typename itk::Image< PixelType, 3> ImageType2D;
-      typedef typename  itk::ImageSeriesWriter<ImageType, ImageType2D> WriterType;
-      typename WriterType::Pointer writer = WriterType::New();
-
-      writer->SetImageIO(dicomIO);
-      writer->SetFileNames(filenames);
-      writer->SetInput(importer->GetOutput());
-      writer->Update();
-
-      //for (int i = 0; i < image.sizeZ(); i++)
-      //{
-      //  typedef itk::GDCMImageIO ImageIOType;
-      //  ImageIOType::Pointer dicomIO2D = ImageIOType::New();
-      //  typedef itk::ImageFileReader< ImageType2D > ReaderType;
-      //  ReaderType::Pointer reader2D = ReaderType::New();
-      //  reader2D->SetImageIO(dicomIO2D);
-      //  reader2D->SetFileName(filenames[i]);
-      //  reader2D->Update();
-
-      //  ImageType2D::Pointer inputImage = reader2D->GetOutput();
-      //  typedef itk::MetaDataDictionary DictionaryType;
-      //  DictionaryType & dictionary = inputImage->GetMetaDataDictionary();
-      //  //itk::EncapsulateMetaData<std::string>(dictionary, "0018|0050", std::string("5.0"));
-      //  std::stringstream imagepos;
-      //  imagepos << std::to_string(origin[0]) << "\\" << std::to_string(origin[1]) << "\\" << std::to_string(origin[2]);
-      //  itk::EncapsulateMetaData<std::string>(dictionary, "0020|0032", imagepos.str());
-
-      //  typedef itk::ImageFileWriter< ImageType2D > WriterType2D;
-      //  WriterType2D::Pointer writer2D = WriterType2D::New();
-      //  writer2D->SetInput(reader2D->GetOutput());
-      //  writer2D->SetFileName(filenames[i]);
-      //  writer2D->SetImageIO(dicomIO2D);
-      //  writer2D->Update();
-      //}
-    }
-    else
-    {
       typedef typename  itk::ImageFileWriter<ImageType> WriterType;
       typename WriterType::Pointer writer = WriterType::New();
       writer->SetFileName(filename);
       writer->SetInput(importer->GetOutput());
       writer->Update();
     }
+    else
+    {
+      const unsigned int Dimension = 3;
+      typedef typename itk::Image<PixelType, Dimension> ImageType;
+      typedef typename itk::ImportImageFilter<PixelType, Dimension> ImportFilterType;
+
+      typename ImportFilterType::Pointer importer = ImportFilterType::New();
+
+      typename ImageType::SizeType size;
+      size[0] = image.sizeX();
+      size[1] = image.sizeY();
+      size[2] = image.sizeZ();
+
+      typename ImageType::IndexType start;
+      start.Fill(0);
+
+      typename ImageType::RegionType region;
+      region.SetSize(size);
+      region.SetIndex(start);
+      importer->SetRegion(region);
+
+      typename ImageType::SpacingType spacing;
+      spacing[0] = image.spacing()[0];
+      spacing[1] = image.spacing()[1];
+      spacing[2] = image.spacing()[2];
+      importer->SetSpacing(spacing);
+
+      typename ImageType::PointType origin;
+      origin[0] = image.origin()[0];
+      origin[1] = image.origin()[1];
+      origin[2] = image.origin()[2];
+      importer->SetOrigin(origin);
+
+      typename ImageType::DirectionType direction;
+      for (int r = 0; r < Dimension; r++)
+      {
+        for (int c = 0; c < Dimension; c++)
+        {
+          direction(r, c) = image.imageToWorld()(r, c);
+        }
+      }
+      importer->SetDirection(direction);
+
+      long counter = 0;
+      std::vector<PixelType> dataConvert(image.size());
+      for (auto& p : const_cast<mia::Image&>(image))
+      {
+        dataConvert[counter++] = static_cast<PixelType>(p);
+      }
+
+      importer->SetImportPointer(&dataConvert[0], image.size(), false);
+      importer->Update();
+
+      if (ext == ".dcm" || ext == ".ima" || ext == "")
+      {
+        auto pos_ext = filename.rfind(ext);
+        auto fname = filename;
+        fname.erase(pos_ext, ext.length());
+        std::vector<std::string> filenames;
+        for (int i = 0; i < image.sizeZ(); i++)
+        {
+
+          std::stringstream filename_slice;
+          filename_slice << fname << "_" << (i + 1000000) << ext;
+          filenames.push_back(filename_slice.str());
+        }
+
+        typedef itk::GDCMImageIO ImageIOType;
+        ImageIOType::Pointer dicomIO = ImageIOType::New();
+        //for (int d = 0; d < 3; d++)
+        //{
+        //  dicomIO->SetSpacing(d, spacing[d]);
+        //  //dicomIO->SetDirection(d, );
+        //  dicomIO->SetOrigin(d, origin[d]);
+        //}
+
+        typedef typename itk::Image< PixelType, 3> ImageType2D;
+        typedef typename  itk::ImageSeriesWriter<ImageType, ImageType2D> WriterType;
+        typename WriterType::Pointer writer = WriterType::New();
+
+        writer->SetImageIO(dicomIO);
+        writer->SetFileNames(filenames);
+        writer->SetInput(importer->GetOutput());
+        writer->Update();
+
+        //for (int i = 0; i < image.sizeZ(); i++)
+        //{
+        //  typedef itk::GDCMImageIO ImageIOType;
+        //  ImageIOType::Pointer dicomIO2D = ImageIOType::New();
+        //  typedef itk::ImageFileReader< ImageType2D > ReaderType;
+        //  ReaderType::Pointer reader2D = ReaderType::New();
+        //  reader2D->SetImageIO(dicomIO2D);
+        //  reader2D->SetFileName(filenames[i]);
+        //  reader2D->Update();
+
+        //  ImageType2D::Pointer inputImage = reader2D->GetOutput();
+        //  typedef itk::MetaDataDictionary DictionaryType;
+        //  DictionaryType & dictionary = inputImage->GetMetaDataDictionary();
+        //  //itk::EncapsulateMetaData<std::string>(dictionary, "0018|0050", std::string("5.0"));
+        //  std::stringstream imagepos;
+        //  imagepos << std::to_string(origin[0]) << "\\" << std::to_string(origin[1]) << "\\" << std::to_string(origin[2]);
+        //  itk::EncapsulateMetaData<std::string>(dictionary, "0020|0032", imagepos.str());
+
+        //  typedef itk::ImageFileWriter< ImageType2D > WriterType2D;
+        //  WriterType2D::Pointer writer2D = WriterType2D::New();
+        //  writer2D->SetInput(reader2D->GetOutput());
+        //  writer2D->SetFileName(filenames[i]);
+        //  writer2D->SetImageIO(dicomIO2D);
+        //  writer2D->Update();
+        //}
+      }
+      else
+      {
+        typedef typename  itk::ImageFileWriter<ImageType> WriterType;
+        typename WriterType::Pointer writer = WriterType::New();
+        writer->SetFileName(filename);
+        writer->SetInput(importer->GetOutput());
+        writer->Update();
+      }
+    }    
   }
 
   void save(const mia::Image& image, const std::string& filename)
