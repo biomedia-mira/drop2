@@ -106,3 +106,5 @@ Detailed instructions and examples are coming soon...
 The original idea for using discrete MRF optimization for image registration was developed back in 2006 by Ben Glocker and Nikos Paragios. The core algorithm has been patented (Pub. No. [WO/2009/010860](https://patentscope.wipo.int/search/en/detail.jsf?docId=WO2009010860)).
 
 We are very grateful for the support and contribution by Jiří Borovec and Jan Kybic. Their efforts on the [Automatic Non-rigid Histological Image Registration (ANHIR) challenge](https://anhir.grand-challenge.org/) made us push for the release of this updated version of the original *drop* registration method which had been lying around in a private repository for too long.
+
+Special thanks go to Hauke Heibel who has contributed signifcantly to the re-implementation of the C++ image processing backend.
