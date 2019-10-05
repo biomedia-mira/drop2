@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
   int o_interpolation;
   float o_fill_value;
   bool o_no_image;
+  bool o_compose_field;
 
   bool run_com_alignment;
 
@@ -80,8 +81,7 @@ int main(int argc, char* argv[])
   int n_interpolation;
   double n_sampling;
   double n_lambda;
-  bool n_pin_boundary;
-  bool n_compose_field;
+  bool n_pin_boundary;  
 
   bool mode_2d;  
 
@@ -103,6 +103,7 @@ int main(int argc, char* argv[])
     ("ointerp", po::value<int>(&o_interpolation)->default_value(1), "OUTPUT: image interpolation (0=NEAREST, 1=LINEAR)")
 	  ("ofill", po::value<float>(&o_fill_value)->default_value(0.0f), "OUTPUT: fill value for out of bounds")
     ("onoimage", po::bool_switch(&o_no_image)->default_value(false), "OUTPUT: no warped image output (only transformation)")
+    ("ocompose", po::bool_switch(&o_compose_field)->default_value(false), "OUTPUT: composed transformation field")
     ("mode2d", po::bool_switch(&mode_2d)->default_value(false), "enable 2D mode")    
     ("com,c", po::bool_switch(&run_com_alignment)->default_value(false), "run CENTER OF MASS alignment")
     ("linear,l", po::bool_switch(&run_linear)->default_value(false), "run LINEAR registration")
@@ -123,7 +124,6 @@ int main(int argc, char* argv[])
     ("nsampling", po::value<double>(&n_sampling)->default_value(1), "NONLINEAR: image sampling probability [0,1]")
     ("nlambda", po::value<double>(&n_lambda)->default_value(0), "NONLINEAR: regularization weight")
     ("npin", po::bool_switch(&n_pin_boundary)->default_value(false), "NONLINEAR: pin boundaries")
-    ("ncompose", po::bool_switch(&n_compose_field)->default_value(false), "NONLINEAR: compose transformation with field")
     ;
 
     po::variables_map vm;
@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
   std::cout << "----------------------------------------" << std::endl;
   auto start = std::chrono::high_resolution_clock::now();
 
-  if (n_compose_field)
+  if (o_compose_field)
   {
     compose(transform, field[0], field[1], field[2]);
   }
@@ -331,7 +331,7 @@ int main(int argc, char* argv[])
     ofs.close();
   }
 
-  if (run_nonlinear)
+  if (run_nonlinear || o_compose_field)
   {    
     std::stringstream filename_field_x;
     filename_field_x << out_folder << "/" << basename << "_field_x.nii.gz";
