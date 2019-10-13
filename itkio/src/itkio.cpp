@@ -18,6 +18,8 @@
 
 #include "itkio.h"
 
+#include "boost/filesystem.hpp"
+
 #include "miaImageIterator.h"
 #include "itkImageFileWriter.h"
 #include "itkImageFileReader.h"
@@ -26,8 +28,6 @@
 #include "itkImportImageFilter.h"
 #include "itkGDCMImageIO.h"
 #include "itkGDCMSeriesFileNames.h"
-
-#include "boost/filesystem.hpp"
 
 namespace itkio
 {
