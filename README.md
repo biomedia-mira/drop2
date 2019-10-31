@@ -99,6 +99,43 @@ The actual registration tool is called `dropreg` and will be located in `build/d
 
 Note, *drop2* is implemented with the intention of making image registration easy-to-use. Some internal optimization parameters are hard-coded and cannot be changed via command line arguments. Run `./dropreg -h` to see a list of arguments.
 
+### Command line arguments
+
+`-h [--help]`     print list of arguments
+
+*drop2* currently supports the following image file formats: uncompressed and compressed NIfTI (default), JPEG, PNG, DICOM, Meta Image, Analyze, NRRD.
+
+`-s [--source]`   filename of source image
+`-t [--target]`   filename of target image
+`-o [--output]`   filename of output image (basename is also used for transformation files)
+
+Binary image masks can be provided which restrict the calculation of similarity measures to the non-zero mask points.
+
+`--smask`   filename of source mask
+`--tmask`   filename of target mask
+
+The affine transformation can be initialized by providing a text file with a 4-by-4 matrix.
+
+`--transform`   filename of transformation file
+
+Same for displacement fields, which can be initialized by providing three images containing the displacement components.
+
+`--fx`  filename of displacement field for X-component
+`--fy`  filename of displacement field for Y-component
+`--fz`  filename of displacement field for Z-component
+
+The interpolation method being used to generate the resulting warped output image can be selected.
+
+`--ointerp`   0=NEAREST, 1=LINEAR (default)
+
+The fill value for out of bounds interpolation can be set.
+
+`--ofill`   default is 0.0
+
+If no output image is required, this can be disabled.
+
+`--onoimage`
+
 Detailed instructions and examples are coming soon...
 
 ## Acknowledgements
