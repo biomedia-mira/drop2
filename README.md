@@ -188,6 +188,12 @@ The linear registration will use random subsampling for calculating the similari
 
 #### Non-linear registration
 
+The non-linear registration in *drop2* is based on discrete MRF optimization of control point displacements in a cubic B-spline FFD transformation model.
+
+Non-linear registration is enabled by adding the argument
+
+`-n [--nonlinear]`
+
 To be done...
 
 ### Examples
