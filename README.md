@@ -101,6 +101,8 @@ Note, *drop2* is implemented with the intention of making image registration eas
 
 ### Command line arguments
 
+#### General arguments
+
 `-h [--help]`     print list of arguments
 
 *drop2* currently supports the following image file formats: uncompressed and compressed NIfTI (default), JPEG, PNG, DICOM, Meta Image, Analyze, NRRD.
@@ -124,6 +126,10 @@ Same for displacement fields, which can be initialized by providing three images
 `--fy`  filename of displacement field for Y-component
 `--fz`  filename of displacement field for Z-component
 
+The same tool can be used for 2D and 3D images. For 2D images, an argument needs to be added. Note, the resulting transformations will be still in 3D format, with the third dimension being set to identiy transformations (or zero displacements).
+
+`--mode2d`
+
 The interpolation method being used to generate the resulting warped output image can be selected.
 
 `--ointerp`   0=NEAREST, 1=LINEAR (default)
@@ -136,7 +142,57 @@ If no output image is required, this can be disabled.
 
 `--onoimage`
 
-Detailed instructions and examples are coming soon...
+The affine transformation can be composed into the resulting displacement field. This may be useful if the displacement fields are used to warp landmarks or similar after registration. The default is to have the affine component of the overall transformation separately in a text file, and displacement field only contains the non-linear component from the Free Form Deformation.
+
+`--ocompose`
+
+#### Center-of-mass alignment
+
+*drop2* provides an optional initialization method using intensity center-of-mass alignment. This is particularly effective for brain image registration.
+
+`-c [--com]`
+
+#### Linear registration
+
+The linear registration of *drop2* is based on gradient-free optimization of similarity measures using Downhill Simplex (aka [Neader-Mead Simplex](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)).
+
+Linear registration is enabled by adding the argument
+
+`-l [--linear]`
+
+There are three types of linear transformations, rigid, simiarity (rigid plus isotropic scaling), and fully affine.
+
+`--ltype` 0=RIGID (default), 1=SIMILARITY, 2=AFFINE
+
+*drop2* comes with three different intensity-based similarity measures, mean absolute differences (MAD), correlation coefficient (CC), and entropy correlation coefficient (ECC). The later is a variant of normalized mutual information and may work for multi-modal image registration. ECC is computed from joint histograms with 16 bins.
+
+`--lsim`  0=MAD (default), 1=CC, 2=ECC
+
+An important set of parameters is concerning the image resolution and multi-scale pyramid on which registration is performed. The pyramid is configured with triplets of scaling factors. For example, a three-level registration with image downscaling factors of 4, 2, and 1 is done with
+
+`--llevels 4 4 4 2 2 2 1 1 1`
+
+Note, a scaling factor of 1 means full, native image resolution. Factors can be different for each image dimension. For 2D, the last number in the triplet should be 1. For example `--llevels 8 8 1 4 4 1` would run a two-level registration on images downsampled by a factor of 8, and then 4.
+
+The number iterations per level of the Downhill Simplex optimizer can be set.
+
+`--liters`  default is 100
+
+The interpolation method for computing the similarity measure can be set. Using nearest neighbors will be speed up registration, but may be less accurate.
+
+`--linterp` 0=NEAREST, 1=LINEAR (default)
+
+The linear registration will use random subsampling for calculating the similarity measure. The sampling rate controls the number of image points being used and directly influences the efficiency of the registration.
+
+`--lsampling` default is 0.05 (5% of the total image points)
+
+#### Non-linear registration
+
+To be done...
+
+### Examples
+
+Example configurations for common registration problems are coming soon...
 
 ## Acknowledgements
 
