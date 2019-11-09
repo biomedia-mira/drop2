@@ -99,6 +99,10 @@ The actual registration tool is called `dropreg` and will be located in `build/d
 
 Note, *drop2* is implemented with the intention of making image registration easy-to-use. Some internal optimization parameters are hard-coded and cannot be changed via command line arguments. Run `./dropreg -h` to see a list of arguments.
 
+IMPORTANT: *drop2* uses the image position and orientation information from the image headers. This information is used to create the initial (identity) transformation. The estimated transformation is thus the residual transformation that is required to align the images after taking the internal image transformations into account. This is essential for registering images acquired in the same session (e.g., different MR sequences, pre- and post-contrast, etc.) where the internal transformations typically already pre-align the images very well (and remaining misalignment may come from patient motion or breathing).
+
+When images from different sessions or different patients are to be registered, the internal transformations stored in the image headers are meaningless and an initialization such as center of mass alignment (see below) is required to obtain a rough pre-alignment.
+
 ### Command line arguments
 
 #### General arguments
@@ -148,7 +152,7 @@ The affine transformation can be composed into the resulting displacement field.
 
 #### Center-of-mass alignment
 
-*drop2* provides an optional initialization method using intensity center-of-mass alignment. This is particularly effective for brain image registration.
+*drop2* provides an optional initialization method using intensity center-of-mass alignment. This is particularly effective for inter-subject or multi-modal brain image registration.
 
 `-c [--com]`
 
@@ -172,7 +176,7 @@ An important set of parameters is concerning the image resolution and multi-scal
 
 `--llevels 4 4 4 2 2 2 1 1 1`
 
-Note, a scaling factor of 1 means full, native image resolution. Factors can be different for each image dimension. For 2D, the last number in the triplet should be 1. For example `--llevels 8 8 1 4 4 1` would run a two-level registration on images downsampled by a factor of 8, and then 4.
+Note, a scaling factor of 1 means full, native image resolution. Factors can be different for each image dimension. For 2D, the last number in the triplet should be 1. For example `--llevels 8 8 1 4 4 1` would run a two-level registration on images downsampled by a factor of 8, and then 4. There is hard coded limit on the number of image points, and an image won't be resampled if the number of voxels would fall below 32.
 
 The number iterations per level of the Downhill Simplex optimizer can be set.
 
@@ -194,11 +198,82 @@ Non-linear registration is enabled by adding the argument
 
 `-n [--nonlinear]`
 
-To be done...
+There is an option to choose between first-order and second-order MRFs. First-order MRFs use pairwise potentials for the regularization term, while second-order MRFs use triple cliques. The latter is experimental and the default is to use first-order MRFs.
+
+`--ntype`   0=FIRST_ORDER (default), 1=SECOND_ORDER
+
+The regularization mode can be set to fluid or elastic. Fluid regularization penalizes only updates of the displacement field, while elastic penalizes the overall displacements. For first-order MRFs, pairwise potentials penalize the L2 norm of the difference vector between neighboring control point displacements (an approximation to first order derivates). In second-rder MRFs, triple clique potentials penalize an approximation to the second order derivates of the displacement field.
+
+`--nreg`  0=FULID (default), 2=ELASTIC
+
+An important parameter is the initial control point spacing of the Free Form Deformation grid which is set in millimeters.
+
+`--nffd`  default is 80
+
+There are the same three similarity measures available for non-linear registration as for linear registration.
+
+`--nsim`  0=MAD (default), 1=CC, 2=ECC
+
+See comments for linear registration on how to set the image levels. In addition, for the case of non-linear registration the image levels are connected to an increase in resolution of the FFD control point grid. Starting from the initial FFD, the control point spacing is halved on each subsequent image level. Note, it is possible to run several levels of FFD spacings on the same image resolution, for example, by setting `--nlevels 2 2 2 2 2 2 2 2 2`. Assuming an initial control points spacing of 80, this would run a three level registration on two times downsampled images for 80, 40 and 20 mm FFD.
+
+`--nlevels`
+
+The number of iterative MRF optimizations per level can be set.
+
+`--niters`  default is 10
+
+The interpolation method for computing the similarity measure can be set. Using nearest neighbors will be speed up registration, but may be less accurate.
+
+`--ninterp` 0=NEAREST, 1=LINEAR (default)
+
+The non-linear registration can use random subsampling for calculating the similarity measure, but this will degrade the quality of the local similarity measures.
+
+`--nsampling` default is 1.0 (100% of the total image points)
+
+The weigthing of the regularization term needs to be set, and this is sensitive to the used similarity measure. For CC and ECC, try values between [0.1,1.0], for MAD the weighting may need to be in the hundreds or more.
+
+`--nlambda`   default is 0.0 (no regularization)
+
+In some applications it may be beneficial to explicitly constraint the deformations by pinning a virtual set of boundary control points. Pinning means to enfource the control point displacements outside the image domain to be zero. This has a strong regularization effect on the resulting deformation. This can be enabled by adding the argument
+
+`--npin`
 
 ### Examples
 
-Example configurations for common registration problems are coming soon...
+Example configurations for common registration problems:
+
+#### Inter-subject linear registration of 3D brain MRI
+
+Let's say we want to rigidly register a subject's brain MRI (source) to an MNI atlas (target). The following setting should provide a good starting point:
+
+`./dropreg -s <source_fname> -t <target_fname> -o <output_fname> -c -l --lsim 1 --ltype 0 --llevels 4 4 4 2 2 2 --lsampling 0.1`
+
+Note, we are using `-c` to initialize the transformation with center of mass alignment. If we want to do affine registration, it may help to add another level to the image pyramid and maybe increase the sampling rate for the similarity measure calculation (due to the larger set of transformation parameters):
+
+`./dropreg -s <source_fname> -t <target_fname> -o <output_fname> -c -l --lsim 1 --ltype 2 --llevels 6 6 6 4 4 4 2 2 2 --lsampling 0.2`
+
+#### Intra-subject non-rigid registration of 3D abdominal CT scans
+
+Say we want to register abdominal images at different breathing cycles (assuming the images are acquired in the same session):
+
+`./dropreg -s <source_fname> -t <target_fname> -o <output_fname> -n --lsim 1 --nffd 80 --nlevels 4 4 4 4 4 4 2 2 2 --nlambda 0.5`
+
+This is using an FFD control grid pyrmaid with 80, 40 and 20mm spacing. We may need to fine-tune the `nlambda` parameter.
+
+
+#### Mono-modal non-registration of anisotropic 3D data
+
+In cases where the image data is highly anistropic, we may want to apply different downsampling factors for different dimensions. The following is an example for registration data from the [POPI dataset](https://www.creatis.insa-lyon.fr/rio/dir_validation_data):
+
+`./dropreg -s <source_fname> -t <target_fname> -o <output_fname> -n --nsim 0 --nffd 40 --nlambda 100 --nlevels 4 4 2 2 2 1`
+
+#### Non-rigid 2D registration of histopathology images
+
+This is assuming we have very large images of say 16k by 16k pixels:
+
+`./dropreg --mode2d -s <source_fname> -t <target_fname> -o <output_fname> -l --llevels 4 4 1 2 2 1 --lsim 1 --lsampling 0.2 -n --nsim 1 --nffd 1000 --nlevels 4 4 1 2 2 1 2 2 1 --nlambda 0.5 --mode2d --ocompose`
+
+The argument `ocompose` will result in the affine transformation being composed with the non-rigid deformation and the resulting displacement field will reflect the entire transformation (not just the non-rigid part).
 
 ## Acknowledgements
 
