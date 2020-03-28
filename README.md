@@ -256,7 +256,7 @@ Note, we are using `-c` to initialize the transformation with center of mass ali
 
 Say we want to register abdominal images at different breathing cycles (assuming the images are acquired in the same session):
 
-`./dropreg -s <source_fname> -t <target_fname> -o <output_fname> -n --lsim 1 --nffd 80 --nlevels 4 4 4 4 4 4 2 2 2 --nlambda 0.5`
+`./dropreg -s <source_fname> -t <target_fname> -o <output_fname> -n --nsim 1 --nffd 80 --nlevels 4 4 4 4 4 4 2 2 2 --nlambda 0.5`
 
 This is using an FFD control grid pyrmaid with 80, 40 and 20mm spacing. We may need to fine-tune the `nlambda` parameter.
 
