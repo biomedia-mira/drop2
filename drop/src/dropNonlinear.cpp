@@ -494,17 +494,29 @@ namespace drop
     int sizeZ = field.sizeZ();
     if (sizeZ > 1)
     {
+      int sz1 = 0;
+      while (sz1 < (sizeZ - 1) && field(0, 0, sz1) == oob) sz1++;
+
+      int sz2 = sizeZ - 1;
+      while (sz2 > 0 && field(0, 0, sz2) == oob) sz2--;
+
       for (int y = 0; y < sizeY; y++)
       {
         for (int x = 0; x < sizeX; x++)
         {
-          if (field(x, y, 0) == oob)
+          for (int z = sz1 - 1; z >= 0; z--)
           {
-            field(x, y, 0) = field(x, y, 1);
+            if (field(x, y, z) == oob)
+            {
+              field(x, y, z) = field(x, y, z + 1);
+            }
           }
-          if (field(x, y, sizeZ - 1) == oob)
+          for (int z = sz2 + 1; z < sizeZ; z++)
           {
-            field(x, y, sizeZ - 1) = field(x, y, sizeZ - 2);
+            if (field(x, y, z) == oob)
+            {
+              field(x, y, z) = field(x, y, z - 1);
+            }
           }
         }
       }
@@ -526,31 +538,57 @@ namespace drop
         }
       }
     }
+
+    int sy1 = 0;
+    while (sy1 < (sizeY - 1) && field(0, sy1, 0) == oob) sy1++;
+
+    int sy2 = sizeY - 1;
+    while (sy2 > 0 && field(0, sy2, 0) == oob) sy2--;
+
     for (int z = 0; z < sizeZ; z++)
     {
       for (int x = 0; x < sizeX; x++)
       {
-        if (field(x, 0, z) == oob)
+        for (int y = sy1 - 1; y >= 0; y--)
         {
-          field(x, 0, z) = field(x, 1, z);
+          if (field(x, y, z) == oob)
+          {
+            field(x, y, z) = field(x, y + 1, z);
+          }
         }
-        if (field(x, sizeY - 1, z) == oob)
+        for (int y = sy2 + 1; y < sizeY; y++)
         {
-          field(x, sizeY - 1, z) = field(x, sizeY - 2, z);
+          if (field(x, y, z) == oob)
+          {
+            field(x, y, z) = field(x, y - 1, z);
+          }
         }
       }
     }
+
+    int sx1 = 0;
+    while (sx1 < (sizeX - 1) && field(sx1, 0, 0) == oob) sx1++;
+
+    int sx2 = sizeX - 1;
+    while (sx2 > 0 && field(sx2, 0, 0) == oob) sx2--;
+
     for (int z = 0; z < sizeZ; z++)
     {
       for (int y = 0; y < sizeY; y++)
       {
-        if (field(0, y, z) == oob)
+        for (int x = sx1 - 1; x >= 0; x--)
         {
-          field(0, y, z) = field(1, y, z);
+          if (field(x, y, z) == oob)
+          {
+            field(x, y, z) = field(x + 1, y, z);
+          }
         }
-        if (field(sizeX - 1, y, z) == oob)
+        for (int x = sx2 + 1; x < sizeX; x++)
         {
-          field(sizeX - 1, y, z) = field(sizeX - 2, y, z);
+          if (field(x, y, z) == oob)
+          {
+            field(x, y, z) = field(x - 1, y, z);
+          }
         }
       }
     }
