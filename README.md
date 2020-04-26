@@ -130,6 +130,10 @@ Same for displacement fields, which can be initialized by providing three images
 `--fy`  filename of displacement field for Y-component
 `--fz`  filename of displacement field for Z-component
 
+Input images may be reoriented using the header information after loading such that the image orientation matrix has non-negative values on the diagonal. This may be necessary when the linear and nonlinear transformations are to be composed into a single displacement field (see option `--ocompose` below).
+
+`--reorient`
+
 The same tool can be used for 2D and 3D images. For 2D images, an argument needs to be added. Note, the resulting transformations will be still in 3D format, with the third dimension being set to identiy transformations (or zero displacements).
 
 `--mode2d`
@@ -146,7 +150,7 @@ If no output image is required, this can be disabled.
 
 `--onoimage`
 
-The affine transformation can be composed into the resulting displacement field. This may be useful if the displacement fields are used to warp landmarks or similar after registration. The default is to have the affine component of the overall transformation separately in a text file, and displacement field only contains the non-linear component from the Free Form Deformation.
+The affine transformation can be composed into the resulting displacement field. This may be useful if the displacement fields are used to warp landmarks or similar after registration. The default is to have the affine component of the overall transformation separately in a text file, and displacement field only contains the non-linear component from the Free Form Deformation. The `--reorient` option may be necessary for composing transformations if the orientation matrices in the image headers contain negative values on the diagonal.
 
 `--ocompose`
 
