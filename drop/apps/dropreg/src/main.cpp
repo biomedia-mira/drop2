@@ -62,6 +62,8 @@ int main(int argc, char* argv[])
   float o_fill_value;
   bool o_no_image;
   bool o_compose_field;
+  
+  bool reorient_images;
 
   bool run_com_alignment;
 
@@ -83,7 +85,7 @@ int main(int argc, char* argv[])
   double n_lambda;
   bool n_pin_boundary;  
 
-  bool mode_2d;  
+  bool mode_2d;
 
   try
   {
@@ -104,6 +106,7 @@ int main(int argc, char* argv[])
 	  ("ofill", po::value<float>(&o_fill_value)->default_value(0.0f), "OUTPUT: fill value for out of bounds")
     ("onoimage", po::bool_switch(&o_no_image)->default_value(false), "OUTPUT: no warped image output (only transformation)")
     ("ocompose", po::bool_switch(&o_compose_field)->default_value(false), "OUTPUT: composed transformation field")
+    ("reorient", po::bool_switch(&reorient_images)->default_value(false), "reorient images")
     ("mode2d", po::bool_switch(&mode_2d)->default_value(false), "enable 2D mode")    
     ("com,c", po::bool_switch(&run_com_alignment)->default_value(false), "run CENTER OF MASS alignment")
     ("linear,l", po::bool_switch(&run_linear)->default_value(false), "run LINEAR registration")
@@ -147,11 +150,21 @@ int main(int argc, char* argv[])
   mia::Image source = itkio::load(filename_source);
   mia::Image target = itkio::load(filename_target);
 
+  if (reorient_images)
+  {
+    source = reorient(source);
+    target = reorient(target);
+  }
+
   // load image masks
   mia::Image source_mask;
   if (filename_source_mask != "")
   {
     source_mask = itkio::load(filename_source_mask);
+    if (reorient_images)
+    {
+      source_mask = reorient(source_mask);
+    }
   }
   else
   {
@@ -163,6 +176,10 @@ int main(int argc, char* argv[])
   if (filename_target_mask != "")
   {
     target_mask = itkio::load(filename_target_mask);
+    if (reorient_images)
+    {
+      target_mask = reorient(target_mask);
+    }
   }
   else
   {
