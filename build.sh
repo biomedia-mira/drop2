@@ -1,22 +1,24 @@
 #!/bin/bash
 
+ITK_VERSION="5.0.0"
+EIGEN_VERSION="3.3.7"
+
 ROOT=$(pwd)
 # prepare 3-party libs
-mkdir 3rdParty
-cd 3rdParty
-export THIRD_PARTY_DIR=$(pwd)
+export THIRD_PARTY_DIR=$ROOT/3rdParty
+mkdir $THIRD_PARTY_DIR
 
 # get Eigen
 cd $THIRD_PARTY_DIR
-wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz --progress=bar:force:noscroll
+wget http://bitbucket.org/eigen/eigen/get/${EIGEN_VERSION}.tar.gz --progress=bar:force:noscroll
 mkdir eigen
-tar xf 3.3.7.tar.gz -C eigen --strip-components=1
+tar xf ${EIGEN_VERSION}.tar.gz -C eigen --strip-components=1
 
 # download and install ITK
 cd $THIRD_PARTY_DIR
-wget https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.2.tar.gz --progress=bar:force:noscroll
-tar xf InsightToolkit-4.13.2.tar.gz
-cd InsightToolkit-4.13.2
+wget https://sourceforge.net/projects/itk/files/itk/${ITK_VERSION%.*}/InsightToolkit-${ITK_VERSION}.tar.gz --progress=bar:force:noscroll
+tar xf InsightToolkit-${ITK_VERSION}.tar.gz
+cd InsightToolkit-${ITK_VERSION}
 mkdir build
 cd build
 cmake \
@@ -28,7 +30,7 @@ make -j$(nproc)
 make install
 
 # install last Boost libs
-apt-get install libboost-all-dev libtbb-dev
+apt-get install -y libboost-all-dev libtbb-dev
 
 # building the
 cd $ROOT
@@ -36,3 +38,5 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc)
+
+unset THIRD_PARTY_DIR
