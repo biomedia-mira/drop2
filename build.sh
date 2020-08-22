@@ -10,9 +10,9 @@ mkdir $THIRD_PARTY_DIR
 
 # get Eigen
 cd $THIRD_PARTY_DIR
-wget http://bitbucket.org/eigen/eigen/get/${EIGEN_VERSION}.tar.gz --progress=bar:force:noscroll
+wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-${EIGEN_VERSION}.tar.gz --progress=bar:force:noscroll
 mkdir eigen
-tar xf ${EIGEN_VERSION}.tar.gz -C eigen --strip-components=1
+tar xf eigen-${EIGEN_VERSION}.tar.gz -C eigen --strip-components=1
 
 # download and install ITK
 cd $THIRD_PARTY_DIR
