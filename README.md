@@ -51,7 +51,7 @@ $ mkdir 3rdparty
 $ cd 3rdparty
 $ wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz --progress=bar:force:noscroll
 $ mkdir eigen
-tar xf eigen-3.3.7.tar.gz -C eigen --strip-components=1
+$ tar xf eigen-3.3.7.tar.gz -C eigen --strip-components=1
 ```
 
 You can download and install ITK in the same `3rdparty` folder via:
