@@ -49,8 +49,9 @@ Eigen is a header-only library and can be simply installed via:
 
 $ mkdir 3rdparty
 $ cd 3rdparty
-$ wget http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz
-$ mkdir -p eigen && tar xvf 3.3.7.tar.gz -C eigen --strip-components=1
+wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz --progress=bar:force:noscroll
+mkdir eigen
+tar xf eigen-3.3.7.tar.gz -C eigen --strip-components=1
 ```
 
 You can download and install ITK in the same `3rdparty` folder via:
@@ -58,9 +59,9 @@ You can download and install ITK in the same `3rdparty` folder via:
 ```
 #!bash
 
-$ wget https://sourceforge.net/projects/itk/files/itk/4.13/InsightToolkit-4.13.2.tar.gz
-$ tar xvf InsightToolkit-4.13.2.tar.gz
-$ cd InsightToolkit-4.13.2
+$ wget https://sourceforge.net/projects/itk/files/itk/5.0/InsightToolkit-5.0.0.tar.gz
+$ tar xvf InsightToolkit-5.0.0.tar.gz
+$ cd InsightToolkit-5.0.0
 $ mkdir build
 $ cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=../../itk ..
