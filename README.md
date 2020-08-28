@@ -49,8 +49,8 @@ Eigen is a header-only library and can be simply installed via:
 
 $ mkdir 3rdparty
 $ cd 3rdparty
-wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz --progress=bar:force:noscroll
-mkdir eigen
+$ wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz --progress=bar:force:noscroll
+$ mkdir eigen
 tar xf eigen-3.3.7.tar.gz -C eigen --strip-components=1
 ```
 
